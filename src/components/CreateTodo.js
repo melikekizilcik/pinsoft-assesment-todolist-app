@@ -9,7 +9,7 @@ import React, { useEffect, useState } from "react";
 import { db } from "../services/firebase.config";
 import { addDoc, collection } from "firebase/firestore";
 
-const List = () => {
+const CreateTodo = () => {
   const collectionRef = collection(db, "todos");
   const [createdTodo, setCreatedTodo] = useState("");
 
@@ -46,4 +46,4 @@ const styles = StyleSheet.create({
     width: 100,
   },
 });
-export default List;
+export default CreateTodo;
