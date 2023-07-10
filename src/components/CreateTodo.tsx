@@ -10,7 +10,7 @@ import {
   Dimensions
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { db } from "../services/firebase.config";
+import { app, db } from "../services/firebase.config";
 import { addDoc, collection, onSnapshot, updateDoc, doc, deleteDoc, serverTimestamp } from "firebase/firestore";
 import TodoCard from "./TodoCard";
 import { AntDesign, Entypo, Feather, FontAwesome } from '@expo/vector-icons'; 
@@ -70,6 +70,7 @@ const addTodo = async () => {
     //delete
     const deleteTodo = async () =>{
       deleteDoc(idRef);
+    
     }  
 
     return(

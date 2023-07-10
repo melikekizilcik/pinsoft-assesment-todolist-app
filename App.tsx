@@ -5,6 +5,7 @@ import EditTodo from "./src/components/EditTodo";
 import CreateTodo from "./src/components/CreateTodo";
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import Login from "./src/screens/Login";
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -15,6 +16,7 @@ export default function App() {
         <Stack.Screen name="TodoListPage" component={TodoListPage}/>
         <Stack.Screen name="EditTodoPage" component={EditTodo} />
         <Stack.Screen name="CreateTodoPage" component={EditTodo} />
+        <Stack.Screen name="Login" component={Login} />
       </Stack.Navigator>
     </NavigationContainer>
   );
