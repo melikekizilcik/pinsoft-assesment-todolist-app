@@ -7,15 +7,12 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Login from "./src/screens/Login";
 import {User, onAuthStateChanged} from "firebase/auth";
 import { FIREBASE_AUTH } from "./src/services/firebase.config";
-import { createDrawerNavigator,  DrawerContentScrollView, DrawerItem, DrawerItemList, } from '@react-navigation/drawer';
-
 
 
 export default function App() {
   const Stack = createNativeStackNavigator();
   const InsideStack = createNativeStackNavigator();
   const [user, setUser] = useState<User | null>(null);
-  const Drawer = createDrawerNavigator();
 
 
   useEffect(() => {
@@ -37,21 +34,6 @@ export default function App() {
     )
   }
 
-  {/* 
-  function CustomDrawerContent() {
-    return (
-      <Drawer.Navigator>
-      <DrawerContentScrollView>
-        <DrawerItemList state={undefined} navigation={undefined} descriptors={undefined}/>
-        <DrawerItem
-          label="Log out"
-          onPress={() => FIREBASE_AUTH.signOut}
-        />
-      </DrawerContentScrollView>
-      </Drawer.Navigator>
-    );
-  } */}
-  
 
   return (
     <NavigationContainer>
