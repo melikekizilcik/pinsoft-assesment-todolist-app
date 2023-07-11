@@ -2,18 +2,18 @@ import {
   View,
   StyleSheet,
   TextInput,
-  Button,
   SafeAreaView,
   Text,
   FlatList,
   TouchableOpacity,
-  Dimensions
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { app, db } from "../services/firebase.config";
+import { db } from "../services/firebase.config";
 import { addDoc, collection, onSnapshot, updateDoc, doc, deleteDoc, serverTimestamp } from "firebase/firestore";
 import TodoCard from "./TodoCard";
 import { AntDesign, Entypo, Feather, FontAwesome } from '@expo/vector-icons'; 
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+
 
 
 //Todo interface
@@ -23,8 +23,14 @@ export interface Todo{
   isChecked: boolean
 }
 
-//Page
-const CreateTodo = ({navigation}) => {
+//navigation
+interface RouterProps{
+  navigation: NativeStackNavigationProp<any,any>;
+  //navigation.navigate("başkasayfa") kullanılabilir
+}
+
+//PAGE
+const CreateTodo = ({navigation}: RouterProps) => {
   const collectionRef = collection(db, "todos");
   const [createdTodo, setCreatedTodo] = useState("");
   const [todos, setTodos] = useState<Todo[]>([]);
@@ -70,7 +76,6 @@ const addTodo = async () => {
     //delete
     const deleteTodo = async () =>{
       deleteDoc(idRef);
-    
     }  
 
     return(
@@ -80,10 +85,10 @@ const addTodo = async () => {
           {!item.isChecked && <Entypo name="circle" size={24} color="black" />}
         </TouchableOpacity>
         <TodoCard todo={item}/>
-        {/* ICONS 
-        <TouchableOpacity onPress={toggleModal} style={styles.editIcons}>
+        {/* ICONS */}
+        <TouchableOpacity onPress={() => navigation.navigate("EditTodoPage")} style={styles.editIcons}>
           <FontAwesome name="edit" size={24} color="black" />
-        </TouchableOpacity> */}
+        </TouchableOpacity> 
       <TouchableOpacity onPress={deleteTodo} style={styles.deleteIcons}>
           <Feather name="trash-2" size={24} color="black" />
     </TouchableOpacity> 
@@ -107,11 +112,12 @@ const addTodo = async () => {
       </View>
 
      {/* GET TODOS */}
-      <View >
+      <View>
         <FlatList nestedScrollEnabled 
           data={todos}
           renderItem={(item) => renderTodo(item)}
           keyExtractor={(todo: Todo) => todo.id}
+          scrollEnabled={false}
         />
       </View>
     </SafeAreaView>
@@ -178,6 +184,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-end"
   },
- 
+  flatlist:{
+    flex:1
+  }
 });
 export default CreateTodo;
