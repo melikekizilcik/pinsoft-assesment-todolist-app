@@ -4,7 +4,7 @@ import React from 'react'
 const TodoCard = ({todo}:any) => {
  
   return (
-    <View>
+    <View >
       <View style={styles.checkbox}>{todo.isChecked}</View>
       <Text style={styles.text}>{todo.todo}</Text>
     </View>
@@ -14,7 +14,9 @@ const TodoCard = ({todo}:any) => {
 export default TodoCard
 
 const styles = StyleSheet.create({
-  container:{},
+  container:{
+    
+  },
   text:{
       fontSize: 16,
   },

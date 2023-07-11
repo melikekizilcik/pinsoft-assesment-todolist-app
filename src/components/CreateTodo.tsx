@@ -2,34 +2,44 @@ import {
   View,
   StyleSheet,
   TextInput,
-  Button,
   SafeAreaView,
   Text,
   FlatList,
   TouchableOpacity,
-  Dimensions
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { db } from "../services/firebase.config";
-import { addDoc, collection, onSnapshot, updateDoc, doc, deleteDoc, serverTimestamp } from "firebase/firestore";
+import { FIREBASE_AUTH, db } from "../services/firebase.config";
+import { addDoc, collection, onSnapshot, updateDoc, doc, deleteDoc, serverTimestamp, getDocs, DocumentData, FieldPath, QueryDocumentSnapshot, SnapshotOptions } from "firebase/firestore";
 import TodoCard from "./TodoCard";
 import { AntDesign, Entypo, Feather, FontAwesome } from '@expo/vector-icons'; 
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+
+
+
 
 
 //Todo interface
 export interface Todo{
   id: string,
   todo: string,
-  isChecked: boolean
+  isChecked: boolean,
+  createdAt: string,
+  uid: string
 }
 
-//Page
-const CreateTodo = ({navigation}) => {
+//navigation
+interface RouterProps{
+  navigation: NativeStackNavigationProp<any,any>;
+  //navigation.navigate("başkasayfa") kullanılabilir
+}
+
+//PAGE
+const CreateTodo = ({navigation}: RouterProps) => {
   const collectionRef = collection(db, "todos");
   const [createdTodo, setCreatedTodo] = useState("");
-  const [todos, setTodos] = useState<Todo[]>([]);
+  const [todos, setTodos] = useState([]);
   const [updatedTodo, setUpdatedTodo] = useState();
-
+  const [loadingTodos, setLoadingTodos] = useState(true);
 
 //create todo function
 const addTodo = async () => {
@@ -37,17 +47,18 @@ const addTodo = async () => {
     todo: createdTodo,
     isChecked: false,
     createdAt: serverTimestamp(),
+    uid: FIREBASE_AUTH.currentUser.uid,
   });
   setCreatedTodo("");
+  getTodos();
 };
 
   
   //verileri çeker ve kodda olan değişiklikleri veritabanına iletir
-  useEffect(() => {
+ {/*} useEffect(() => {
     const listener = onSnapshot(collectionRef, {
       next: (snapshot) => {
-        const todos: Todo[] = [];
-        snapshot.docs.forEach((doc) =>
+        snapshot.docs.filter((doc) =>
           todos.push({
             id: doc.id,
             ...doc.data(),
@@ -56,8 +67,29 @@ const addTodo = async () => {
         setTodos(todos);
       },
     });
-  }, []); 
+  }, []); */}
 
+  async function getTodos() {
+    await getDocs(collectionRef)
+    .then((todo) => {
+      let filteredTodos = todo.docs.filter(
+        (todo) => todo.data().uid === FIREBASE_AUTH.currentUser.uid
+      );
+      let todosData = filteredTodos.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+      const sortedTodosData = todosData.sort((a :any, b : any) => {
+        return b.createdAt - a.createdAt;
+      });
+      setTodos(sortedTodosData);
+      setLoadingTodos(false);
+    })
+  } 
+  
+  useEffect(() => {
+    getTodos();
+  }, [])
 
   const renderTodo = ({item}: any) => {
     const idRef = doc(db, `todos/${item.id}`);
@@ -65,11 +97,13 @@ const addTodo = async () => {
     //toggle done
     const toggleDone =async () => {
      updateDoc(idRef, {isChecked: !item.isChecked});
+     getTodos();
     }
 
     //delete
     const deleteTodo = async () =>{
       deleteDoc(idRef);
+      getTodos();
     }  
 
     return(
@@ -79,10 +113,10 @@ const addTodo = async () => {
           {!item.isChecked && <Entypo name="circle" size={24} color="black" />}
         </TouchableOpacity>
         <TodoCard todo={item}/>
-        {/* ICONS 
-        <TouchableOpacity onPress={toggleModal} style={styles.editIcons}>
+        {/* ICONS */}
+        <TouchableOpacity onPress={() => navigation.navigate("EditTodoPage")} style={styles.editIcons}>
           <FontAwesome name="edit" size={24} color="black" />
-        </TouchableOpacity> */}
+        </TouchableOpacity> 
       <TouchableOpacity onPress={deleteTodo} style={styles.deleteIcons}>
           <Feather name="trash-2" size={24} color="black" />
     </TouchableOpacity> 
@@ -106,13 +140,22 @@ const addTodo = async () => {
       </View>
 
      {/* GET TODOS */}
-      <View >
+      <View>
         <FlatList nestedScrollEnabled 
           data={todos}
           renderItem={(item) => renderTodo(item)}
           keyExtractor={(todo: Todo) => todo.id}
+          scrollEnabled={false}
         />
       </View>
+
+      {/* LOG OUT
+      <View>
+      <TouchableOpacity style={styles.logoutButton} onPress={() => FIREBASE_AUTH.signOut()}>
+            <AntDesign name="logout" size={24} color="black" />
+            <Text>Logout</Text>
+          </TouchableOpacity> 
+      </View> */}
     </SafeAreaView>
   );
 };
@@ -178,6 +221,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-end"
   },
- 
+  flatlist:{
+    flex:1
+  },
+  logoutButton: {
+    alignSelf: "center",
+    margin: 30
+  }
 });
 export default CreateTodo;
