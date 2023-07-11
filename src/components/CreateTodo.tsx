@@ -114,9 +114,6 @@ const addTodo = async () => {
         </TouchableOpacity>
         <TodoCard todo={item}/>
         {/* ICONS */}
-        <TouchableOpacity onPress={() => navigation.navigate("EditTodoPage")} style={styles.editIcons}>
-          <FontAwesome name="edit" size={24} color="black" />
-        </TouchableOpacity> 
       <TouchableOpacity onPress={deleteTodo} style={styles.deleteIcons}>
           <Feather name="trash-2" size={24} color="black" />
     </TouchableOpacity> 
