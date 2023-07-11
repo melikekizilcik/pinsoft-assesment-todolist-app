@@ -1,16 +1,22 @@
 import React from "react";
-import { View, Text, SafeAreaView, StyleSheet } from "react-native";
+import { View, Text, SafeAreaView, StyleSheet, Button, TouchableOpacity } from "react-native";
 import CreateTodo from "../components/CreateTodo";
 import { ScrollView } from "react-native-gesture-handler";
+import { FIREBASE_AUTH } from "../services/firebase.config";
+import { AntDesign } from '@expo/vector-icons';
 
 const TodoListPage = () => {
   return (
-    <ScrollView nestedScrollEnabled={true}>
+    <ScrollView>
       <View>
         <Text style={styles.title}>Todos</Text>
         <CreateTodo navigation={undefined} />
+          <TouchableOpacity style={styles.logoutButton} onPress={() => FIREBASE_AUTH.signOut()}>
+            <AntDesign name="logout" size={24} color="black" />
+            <Text>Logout</Text>
+          </TouchableOpacity> 
       </View>
-    </ScrollView>
+      </ScrollView>
   );
 };
 
@@ -26,6 +32,10 @@ const styles = StyleSheet.create({
     paddingLeft: 15,
     color: "#338BA8"
 
+  },
+  logoutButton: {
+    alignSelf: "center",
+    margin: 30
   }
 })
 
