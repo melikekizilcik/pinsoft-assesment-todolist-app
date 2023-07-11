@@ -9,10 +9,12 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { FIREBASE_AUTH, db } from "../services/firebase.config";
-import { addDoc, collection, onSnapshot, updateDoc, doc, deleteDoc, serverTimestamp } from "firebase/firestore";
+import { addDoc, collection, onSnapshot, updateDoc, doc, deleteDoc, serverTimestamp, getDocs, DocumentData, FieldPath, QueryDocumentSnapshot, SnapshotOptions } from "firebase/firestore";
 import TodoCard from "./TodoCard";
 import { AntDesign, Entypo, Feather, FontAwesome } from '@expo/vector-icons'; 
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+
+
 
 
 
@@ -20,7 +22,9 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 export interface Todo{
   id: string,
   todo: string,
-  isChecked: boolean
+  isChecked: boolean,
+  createdAt: string,
+  uid: string
 }
 
 //navigation
@@ -33,9 +37,9 @@ interface RouterProps{
 const CreateTodo = ({navigation}: RouterProps) => {
   const collectionRef = collection(db, "todos");
   const [createdTodo, setCreatedTodo] = useState("");
-  const [todos, setTodos] = useState<Todo[]>([]);
+  const [todos, setTodos] = useState([]);
   const [updatedTodo, setUpdatedTodo] = useState();
-
+  const [loadingTodos, setLoadingTodos] = useState(true);
 
 //create todo function
 const addTodo = async () => {
@@ -46,15 +50,15 @@ const addTodo = async () => {
     uid: FIREBASE_AUTH.currentUser.uid,
   });
   setCreatedTodo("");
+  getTodos();
 };
 
   
   //verileri çeker ve kodda olan değişiklikleri veritabanına iletir
-  useEffect(() => {
+ {/*} useEffect(() => {
     const listener = onSnapshot(collectionRef, {
       next: (snapshot) => {
-        const todos: Todo[] = [];
-        snapshot.docs.forEach((doc) =>
+        snapshot.docs.filter((doc) =>
           todos.push({
             id: doc.id,
             ...doc.data(),
@@ -63,8 +67,29 @@ const addTodo = async () => {
         setTodos(todos);
       },
     });
-  }, []); 
+  }, []); */}
 
+  async function getTodos() {
+    await getDocs(collectionRef)
+    .then((todo) => {
+      let filteredTodos = todo.docs.filter(
+        (todo) => todo.data().uid === FIREBASE_AUTH.currentUser.uid
+      );
+      let todosData = filteredTodos.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+      const sortedTodosData = todosData.sort((a :any, b : any) => {
+        return b.createdAt - a.createdAt;
+      });
+      setTodos(sortedTodosData);
+      setLoadingTodos(false);
+    })
+  } 
+  
+  useEffect(() => {
+    getTodos();
+  }, [])
 
   const renderTodo = ({item}: any) => {
     const idRef = doc(db, `todos/${item.id}`);
@@ -72,11 +97,13 @@ const addTodo = async () => {
     //toggle done
     const toggleDone =async () => {
      updateDoc(idRef, {isChecked: !item.isChecked});
+     getTodos();
     }
 
     //delete
     const deleteTodo = async () =>{
       deleteDoc(idRef);
+      getTodos();
     }  
 
     return(
@@ -121,6 +148,14 @@ const addTodo = async () => {
           scrollEnabled={false}
         />
       </View>
+
+      {/* LOG OUT
+      <View>
+      <TouchableOpacity style={styles.logoutButton} onPress={() => FIREBASE_AUTH.signOut()}>
+            <AntDesign name="logout" size={24} color="black" />
+            <Text>Logout</Text>
+          </TouchableOpacity> 
+      </View> */}
     </SafeAreaView>
   );
 };
@@ -187,6 +222,10 @@ const styles = StyleSheet.create({
   },
   flatlist:{
     flex:1
+  },
+  logoutButton: {
+    alignSelf: "center",
+    margin: 30
   }
 });
 export default CreateTodo;

@@ -1,13 +1,29 @@
-import React from "react";
-import { View, Text, SafeAreaView, StyleSheet, Button, TouchableOpacity } from "react-native";
+import React, {useState, useCallback} from "react";
+import { View, Text, StyleSheet, TouchableOpacity, RefreshControl } from "react-native";
 import CreateTodo from "../components/CreateTodo";
 import { ScrollView } from "react-native-gesture-handler";
 import { FIREBASE_AUTH } from "../services/firebase.config";
 import { AntDesign } from '@expo/vector-icons';
 
 const TodoListPage = () => {
+  const [refresh, setRefresh] = useState(false);
+  const onRefresh = useCallback(() => {
+    setRefresh(true);
+    setTimeout(() => {
+      setRefresh(false);
+    }, 2000);
+  }, []);
+
+
   return (
-    <ScrollView>
+    <ScrollView
+    refreshControl={
+      <RefreshControl 
+        refreshing={refresh}
+        onRefresh={onRefresh}
+      />
+    }
+    >
       <View>
         <Text style={styles.title}>Todos</Text>
         <CreateTodo navigation={undefined} />
