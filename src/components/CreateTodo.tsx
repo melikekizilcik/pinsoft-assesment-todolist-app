@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { db } from "../services/firebase.config";
+import { FIREBASE_AUTH, db } from "../services/firebase.config";
 import { addDoc, collection, onSnapshot, updateDoc, doc, deleteDoc, serverTimestamp } from "firebase/firestore";
 import TodoCard from "./TodoCard";
 import { AntDesign, Entypo, Feather, FontAwesome } from '@expo/vector-icons'; 
@@ -43,6 +43,7 @@ const addTodo = async () => {
     todo: createdTodo,
     isChecked: false,
     createdAt: serverTimestamp(),
+    uid: FIREBASE_AUTH.currentUser.uid,
   });
   setCreatedTodo("");
 };
