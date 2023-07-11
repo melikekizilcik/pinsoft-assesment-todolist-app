@@ -1,6 +1,5 @@
 import React, {useState, useEffect} from "react";
 import TodoListPage from "./src/screens/TodoListPage";
-import EditTodo from "./src/components/EditTodo";
 import CreateTodo from "./src/components/CreateTodo";
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -28,7 +27,6 @@ export default function App() {
     return(
       <InsideStack.Navigator>
         <InsideStack.Screen name="TodoListPage" component={TodoListPage} options={{headerShown: false}}/>
-        <InsideStack.Screen name="EditTodoPage" component={EditTodo} options={{headerShown: false}}/>
         <InsideStack.Screen name="CreateTodoPage" component={CreateTodo} options={{headerShown: false}}/>
       </InsideStack.Navigator>
     )
