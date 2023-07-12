@@ -1,7 +1,8 @@
-import { View, Text, StyleSheet, TextInput, ActivityIndicator, Button, KeyboardAvoidingView, TouchableOpacity} from 'react-native'
+import { View, Text, StyleSheet, TextInput, ActivityIndicator, Image, KeyboardAvoidingView, TouchableOpacity} from 'react-native'
 import React, {useState} from 'react'
 import { FIREBASE_AUTH } from '../services/firebase.config';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { ScrollView } from 'react-native-gesture-handler';
 
 
 
@@ -37,7 +38,11 @@ const Login = () => {
     }
 
   return (
+    <ScrollView scrollEnabled={false}>
     <View style={styles.container}>
+        <View style={styles.imageContainer}>
+            <Image  source={require("../../assets/logo.png")} style={styles.logo}/>
+        </View>
     <KeyboardAvoidingView behavior="padding">
       <TextInput 
         style={styles.input}
@@ -66,6 +71,7 @@ const Login = () => {
         </>}
     </KeyboardAvoidingView>
     </View>
+    </ScrollView>
   )
 }
 
@@ -73,7 +79,8 @@ const styles = StyleSheet.create({
     container:{
         marginHorizontal: 20,
         flex:1,
-        justifyContent: 'center'
+        justifyContent: 'center',
+        marginVertical: 150
     },
     input: {
         marginVertical: 4,
@@ -110,6 +117,15 @@ const styles = StyleSheet.create({
     },
     buttonView:{
         marginTop: 20
+    },
+    logo:{
+        width: 250,
+        height: 250,
+        marginVertical: 80,
+        marginHorizontal: 44
+    },
+    imageContainer:{
+        marginVertical: -70
     }
 })
 export default Login
